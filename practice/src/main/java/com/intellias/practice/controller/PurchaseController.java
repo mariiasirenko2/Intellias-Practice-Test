@@ -25,35 +25,15 @@ public class PurchaseController {
 
     @GetMapping("/buyProduct")
     public String buyProduct(@RequestParam(value = "user_id") int userId,
-                           @RequestParam(value = "product_id") int productId) throws UserNotFoundException, ProductNotFoundException, NoMoneyException {
+                             @RequestParam(value = "product_id") int productId) throws UserNotFoundException, ProductNotFoundException, NoMoneyException {
 
         User user = userService.getUserById(userId);
         Product product = productService.getProductById(productId);
 
-        buyProduct(user, product);
-        return "Successful "+product.getName()+ " purchase";
+        purchaseService.buyProduct(user, product);
+        return "Successful " + product.getName() + " purchase";
 
     }
 
 
-    private void buyProduct(User user, Product product) throws NoMoneyException {
-        checkMoneyAmount(user.getMoneyAmount(), product.getPrice());
-        withdrawMoney(user, product.getPrice());
-        savePurchase(user, product);
-
-    }
-
-    private void checkMoneyAmount(double userMoney, double price) throws NoMoneyException {
-        if (userMoney < price) throw new NoMoneyException();
-    }
-
-    private void withdrawMoney(User user, double moneyToWithdrew) {
-        user.setMoneyAmount(user.getMoneyAmount() - moneyToWithdrew);
-
-    }
-
-    private void savePurchase(User user, Product product) {
-        purchaseService.addNewPurchase(new Purchase(user, product));
-
-    }
 }
